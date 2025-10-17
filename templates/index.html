@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineHub - Khám Phá Thế Giới Điện Ảnh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .movie-card {
+            transition: all 0.3s ease;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .movie-info {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .movie-card:hover .movie-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .carousel-slide {
+            display: none;
+        }
+        
+        .carousel-slide.active {
+            display: block;
+        }
+        
+        .gradient-overlay {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(249, 115, 22, 0.8));
+        }
+        
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-full">
+    <!-- Header -->
+    <header class="bg-black bg-opacity-90 backdrop-blur-sm fixed w-full top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-xl">C</span>
+                </div>
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">CineHub</h1>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#" class="hover:text-orange-500 transition-colors">Trang chủ</a>
+                <a href="#" class="hover:text-orange-500 transition-colors">Thể loại</a>
+                <a href="#" class="hover:text-orange-500 transition-colors">Top 10</a>
+                <a href="#" class="hover:text-orange-500 transition-colors">Phim mới</a>
+                <!-- <a href="#" class="hover:text-orange-500 transition-colors">Liên hệ</a> -->
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Tìm kiếm phim..." class="bg-gray-800 text-white px-4 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <button class="absolute right-2 top-2 text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button class="md:hidden text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="pt-20">
+        <!-- Movie Recommendation System -->
+        <section class="py-16 bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+                        🎬 Hệ Thống Gợi Ý Phim
+                    </h1>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        Nhập ID hoặc tên phim yêu thích để nhận những gợi ý phim tương tự phù hợp với sở thích của bạn
+                    </p>
+                </div>
+                
+                <!-- Search Form -->
+                <div class="max-w-4xl mx-auto mb-12">
+                    <form id="recommendationForm" class="bg-gray-800 bg-opacity-50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="userId" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                                <input type="number" id="userId" name="userId" 
+                                       placeholder="Ví dụ: 1" 
+                                       value="1"
+                                       class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label for="movieTitle" class="block text-sm font-medium text-gray-300 mb-2">Tên Phim *</label>
+                                <input type="text" id="movieTitle" name="movieTitle" 
+                                       placeholder="Ví dụ: Avengers Endgame" 
+                                       required
+                                       class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="topN" class="block text-sm font-medium text-gray-300 mb-2">Số lượng gợi ý</label>
+                                <select id="topN" name="topN" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <option value="5" selected>5 phim</option>
+                                    <option value="10">10 phim</option>
+                                    <option value="15">15 phim</option>
+                                    <option value="20">20 phim</option>
+                                </select>
+                            </div>
+                            <div>
+                                <!-- Empty div to maintain grid layout -->
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden API URL field -->
+                        <input type="hidden" id="apiUrl" name="apiUrl" value="http://localhost:5000/api/recommendations">
+                        
+                        <div class="text-center">
+                            <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-12 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                                🔍 Tìm Phim Gợi Ý
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loadingState" class="hidden text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
+                    <p class="text-gray-300">Đang tìm kiếm những bộ phim phù hợp với bạn...</p>
+                </div>
+                
+                <!-- Results Section -->
+                <div id="resultsSection" class="hidden">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-orange-400 mb-2">🎯 Kết Quả Gợi Ý</h2>
+                        <p id="resultsDescription" class="text-gray-300"></p>
+                    </div>
+                    
+                    <div id="recommendedMovies" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Recommended movies will be inserted here -->
+                    </div>
+                    
+                    <div class="text-center mt-8">
+                        <button onclick="clearResults()" class="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-lg font-semibold transition-colors">
+                            🔄 Tìm Kiếm Mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Movie Categories -->
+        <section class="py-16 bg-gray-900">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold mb-8 text-center">Khám phá theo thể loại</h2>
+                
+                <!-- Action Movies -->
+                <div class="mb-12">
+                    <h3 class="text-2xl font-semibold mb-6 text-orange-500">🎬 Phim Hành Động</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-red-600 to-red-800 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🦸‍♂️</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Spider-Man</h4>
+                                <p class="text-sm text-gray-300 mb-2">2021 • 8.2⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-blue-600 to-blue-800 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🚗</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Fast & Furious</h4>
+                                <p class="text-sm text-gray-300 mb-2">2021 • 7.8⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-green-600 to-green-800 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🤖</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Transformers</h4>
+                                <p class="text-sm text-gray-300 mb-2">2020 • 7.5⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-purple-600 to-purple-800 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">⚔️</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">John Wick</h4>
+                                <p class="text-sm text-gray-300 mb-2">2019 • 8.5⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-yellow-600 to-yellow-800 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🔫</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Mission Impossible</h4>
+                                <p class="text-sm text-gray-300 mb-2">2022 • 8.1⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🛡️</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Wonder Woman</h4>
+                                <p class="text-sm text-gray-300 mb-2">2020 • 7.9⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comedy Movies -->
+                <div class="mb-12">
+                    <h3 class="text-2xl font-semibold mb-6 text-orange-500">😂 Phim Hài</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-pink-500 to-pink-700 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🎭</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">The Hangover</h4>
+                                <p class="text-sm text-gray-300 mb-2">2019 • 8.0⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-teal-500 to-teal-700 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🤪</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Dumb & Dumber</h4>
+                                <p class="text-sm text-gray-300 mb-2">2018 • 7.6⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-orange-500 to-orange-700 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🎪</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Jumanji</h4>
+                                <p class="text-sm text-gray-300 mb-2">2021 • 7.8⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-cyan-500 to-cyan-700 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🎬</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Deadpool</h4>
+                                <p class="text-sm text-gray-300 mb-2">2020 • 8.3⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-lime-500 to-lime-700 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🎉</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Superbad</h4>
+                                <p class="text-sm text-gray-300 mb-2">2017 • 7.4⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="movie-card relative group cursor-pointer">
+                            <div class="bg-gradient-to-br from-rose-500 to-rose-700 h-80 rounded-lg flex items-center justify-center">
+                                <span class="text-4xl">🎈</span>
+                            </div>
+                            <div class="movie-info absolute inset-0 bg-black bg-opacity-90 rounded-lg flex flex-col justify-end p-4">
+                                <h4 class="font-bold text-lg mb-2">Anchorman</h4>
+                                <p class="text-sm text-gray-300 mb-2">2016 • 7.2⭐</p>
+                                <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded text-sm font-semibold transition-colors">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top 10 Section -->
+        <section class="py-16 bg-gray-800">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold mb-8 text-center">🏆 Top 10 Phim Phổ Biến</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <div class="bg-gradient-to-br from-yellow-500 to-yellow-700 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
+                        <div class="text-4xl mb-4">👑</div>
+                        <h3 class="font-bold text-lg mb-2 text-black">The Godfather</h3>
+                        <p class="text-sm text-gray-800">9.2⭐ • 1972</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-silver-400 to-gray-600 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
+                        <div class="text-4xl mb-4">🎭</div>
+                        <h3 class="font-bold text-lg mb-2">The Dark Knight</h3>
+                        <p class="text-sm text-gray-300">9.0⭐ • 2008</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-amber-600 to-amber-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</div>
+                        <div class="text-4xl mb-4">⚖️</div>
+                        <h3 class="font-bold text-lg mb-2 text-black">12 Angry Men</h3>
+                        <p class="text-sm text-gray-800">9.0⭐ • 1957</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-red-600 to-red-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">4</div>
+                        <div class="text-4xl mb-4">🎬</div>
+                        <h3 class="font-bold text-lg mb-2">Schindler's List</h3>
+                        <p class="text-sm text-gray-300">8.9⭐ • 1993</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-600 to-green-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">5</div>
+                        <div class="text-4xl mb-4">🌟</div>
+                        <h3 class="font-bold text-lg mb-2">Pulp Fiction</h3>
+                        <p class="text-sm text-gray-300">8.9⭐ • 1994</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
+                    <div class="bg-gradient-to-br from-purple-600 to-purple-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">6</div>
+                        <div class="text-4xl mb-4">🎪</div>
+                        <h3 class="font-bold text-lg mb-2">Forrest Gump</h3>
+                        <p class="text-sm text-gray-300">8.8⭐ • 1994</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">7</div>
+                        <div class="text-4xl mb-4">🌀</div>
+                        <h3 class="font-bold text-lg mb-2">Inception</h3>
+                        <p class="text-sm text-gray-300">8.8⭐ • 2010</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">8</div>
+                        <div class="text-4xl mb-4">🚀</div>
+                        <h3 class="font-bold text-lg mb-2">Interstellar</h3>
+                        <p class="text-sm text-gray-300">8.6⭐ • 2014</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-pink-600 to-pink-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">9</div>
+                        <div class="text-4xl mb-4">🎯</div>
+                        <h3 class="font-bold text-lg mb-2">Fight Club</h3>
+                        <p class="text-sm text-gray-300">8.8⭐ • 1999</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-teal-600 to-teal-800 p-6 rounded-lg text-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">10</div>
+                        <div class="text-4xl mb-4">🎨</div>
+                        <h3 class="font-bold text-lg mb-2">Goodfellas</h3>
+                        <p class="text-sm text-gray-300">8.7⭐ • 1990</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-xl">C</span>
+                        </div>
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">CineHub</h3>
+                    </div>
+                    <p class="text-gray-400">Khám phá thế giới điện ảnh với những bộ phim hay nhất mọi thời đại.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Danh mục</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Phim hành động</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Phim hài</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Phim kinh dị</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Phim tình cảm</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Hỗ trợ</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Liên hệ</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Câu hỏi thường gặp</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Điều khoản sử dụng</a></li>
+                        <li><a href="#" class="hover:text-orange-500 transition-colors">Chính sách bảo mật</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Theo dõi chúng tôi</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="bg-gray-800 hover:bg-orange-500 p-3 rounded-full transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="bg-gray-800 hover:bg-orange-500 p-3 rounded-full transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="bg-gray-800 hover:bg-orange-500 p-3 rounded-full transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.097.118.112.222.083.343-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z.017 0z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 CineHub. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Recommendation form handler
+        document.getElementById('recommendationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = parseInt(document.getElementById('userId').value) || 1;
+            const movieTitle = document.getElementById('movieTitle').value.trim();
+            const topN = parseInt(document.getElementById('topN').value) || 5;
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            
+            if (!movieTitle) {
+                showNotification('Vui lòng nhập tên phim!', 'error');
+                return;
+            }
+            
+            if (!apiUrl) {
+                showNotification('Vui lòng nhập URL API!', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        movieTitle: movieTitle,
+                        topN: topN
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayRecommendations(data.recommendations, data.movieTitle, data.userId);
+                showNotification('Tìm kiếm thành công!', 'success');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification(`Lỗi: ${error.message}`, 'error');
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+        });
+
+        function showLoading() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+        }
+
+        function displayRecommendations(recommendations, searchTerm, userId) {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            const resultsDescription = document.getElementById('resultsDescription');
+            resultsDescription.textContent = `Tìm thấy ${recommendations.length} bộ phim gợi ý cho User ${userId} dựa trên "${searchTerm}"`;
+            
+            const moviesContainer = document.getElementById('recommendedMovies');
+            moviesContainer.innerHTML = '';
+            
+            recommendations.forEach((movie, index) => {
+                const movieCard = createMovieCard(movie, index + 1);
+                moviesContainer.appendChild(movieCard);
+            });
+            
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function createMovieCard(movie, rank) {
+            const card = document.createElement('div');
+            card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105';
+            
+            // Generate random gradient for visual appeal
+            const gradients = [
+                'from-red-500 to-red-700',
+                'from-blue-500 to-blue-700',
+                'from-green-500 to-green-700',
+                'from-purple-500 to-purple-700',
+                'from-pink-500 to-pink-700',
+                'from-yellow-500 to-yellow-700',
+                'from-indigo-500 to-indigo-700',
+                'from-teal-500 to-teal-700'
+            ];
+            
+            const gradientClass = gradients[rank % gradients.length];
+            
+            // Handle different possible field names from API response
+            const title = movie.title || movie.Title || movie.movie_title || 'Unknown Title';
+            const rating = movie.rating || movie.Rating || movie.imdb_rating || movie.vote_average || 'N/A';
+            const year = movie.year || movie.Year || movie.release_year || movie.release_date?.substring(0, 4) || 'N/A';
+            const genre = movie.genre || movie.Genre || movie.genres || 'Unknown';
+            const similarity = movie.similarity || movie.similarity_score || movie.score || Math.random();
+            
+            card.innerHTML = `
+                <div class="bg-gradient-to-br ${gradientClass} h-48 flex items-center justify-center relative">
+                    <div class="absolute top-2 left-2 bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                        ${rank}
+                    </div>
+                    <div class="text-4xl">🎬</div>
+                </div>
+                <div class="p-4">
+                    <h3 class="font-bold text-lg mb-2 text-white" title="${title}">${title.length > 25 ? title.substring(0, 25) + '...' : title}</h3>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="bg-yellow-500 text-black px-2 py-1 rounded text-sm font-bold">
+                            ${typeof rating === 'number' ? rating.toFixed(1) : rating} ⭐
+                        </span>
+                        <span class="text-gray-400 text-sm">${year}</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-orange-400 text-sm capitalize">${Array.isArray(genre) ? genre.join(', ') : genre}</span>
+                        <span class="text-green-400 text-sm">${Math.round(similarity * 100)}% phù hợp</span>
+                    </div>
+                    ${movie.overview || movie.description ? `
+                        <p class="text-gray-300 text-sm mb-3 line-clamp-2">${(movie.overview || movie.description).substring(0, 100)}...</p>
+                    ` : ''}
+                    <button onclick="viewMovieDetails('${title}')" class="w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold transition-colors">
+                        Xem chi tiết
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function clearResults() {
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('recommendationForm').reset();
+            document.getElementById('recommendationForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearResults() {
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('recommendationForm').reset();
+            // Reset default values
+            document.getElementById('userId').value = '1';
+            document.getElementById('topN').value = '5';
+            // API URL remains hidden and unchanged
+            document.getElementById('recommendationForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function viewMovieDetails(movieTitle) {
+            showNotification(`Đang xem chi tiết phim: ${movieTitle}`, 'success');
+            // In real app, this would navigate to movie details page or open modal
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-24 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 ${
+                type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+            } text-white max-w-md`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Search functionality in header
+        document.querySelector('input[placeholder="Tìm kiếm phim..."]').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    document.getElementById('movieTitle').value = searchTerm;
+                    document.getElementById('recommendationForm').scrollIntoView({ behavior: 'smooth' });
+                    this.value = '';
+                }
+            }
+        });
+
+        // Movie card click handlers for existing sections
+        document.querySelectorAll('.movie-card button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const movieTitle = this.closest('.movie-card').querySelector('h4').textContent;
+                document.getElementById('movieTitle').value = movieTitle;
+                document.getElementById('recommendationForm').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Top 10 card click handlers
+        document.querySelectorAll('.bg-gradient-to-br').forEach(card => {
+            if (card.querySelector('h3')) {
+                card.addEventListener('click', function() {
+                    const movieTitle = this.querySelector('h3').textContent;
+                    document.getElementById('movieTitle').value = movieTitle;
+                    document.getElementById('recommendationForm').scrollIntoView({ behavior: 'smooth' });
+                });
+                card.style.cursor = 'pointer';
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99011778572785b5',t:'MTc2MDcxNzY5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
